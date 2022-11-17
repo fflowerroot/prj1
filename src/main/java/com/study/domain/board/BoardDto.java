@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import lombok.Data;
-//우리가 쓰는 저장소 3가지 : desktop, github, root
+//우리가 쓰는 저장소 3가지 ? : desktop, github, root
 @Data
 public class BoardDto {
 	private int id;
