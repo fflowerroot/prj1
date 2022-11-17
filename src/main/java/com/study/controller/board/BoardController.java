@@ -1,14 +1,20 @@
 package com.study.controller.board;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -111,6 +117,7 @@ public class BoardController {
 	}
 	
 	@GetMapping("modify")
+	@PreAuthorize("@boardSecurity.checkWriter(authentication.name, #id)")
 	public void modify(int id, Model model) {
 		BoardDto board = service.get(id);
 		model.addAttribute("board", board);
@@ -118,6 +125,7 @@ public class BoardController {
 	}
 	
 	@PostMapping("modify")
+	@PreAuthorize("@boardSecurity.checkWriter(authentication.name, #board.id)")
 	public String modify(
 			BoardDto board, 
 			@RequestParam("files") MultipartFile[] addFiles,
@@ -136,6 +144,7 @@ public class BoardController {
 	}
 	
 	@PostMapping("remove")
+	@PreAuthorize("@boardSecurity.checkWriter(authentication.name, #id)")
 	public String remove(int id, RedirectAttributes rttr) {
 		int cnt = service.remove(id);
 		
@@ -150,8 +159,25 @@ public class BoardController {
 		return "redirect:/board/list";
 	}
 	
+	@PutMapping("like")
+	@ResponseBody
+	@PreAuthorize("isAuthenticated()")
+	public Map<String, Object> like(@RequestBody Map<String, String> req,
+			Authentication authentication) {
+		
+		Map<String, Object> result = service.updateLike(req.get("boardId"), authentication.getName());
+		
+		return result;
+	}
 	
 }
+
+
+
+
+
+
+
 
 
 
